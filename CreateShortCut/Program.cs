@@ -8,26 +8,35 @@ namespace CreateShortCut
 {
     internal static class Program
     {
-        private static bool isRunning = false; // アプリケーションが既に実行中かどうかを追跡するフラグを追加
+        private static bool isRunning = false;
 
-        /// <summary>
-        /// アプリケーションのメイン エントリ ポイントです。
-        /// </summary>
         [STAThread]
         static void Main()
         {
             if (isRunning)
             {
-                return; // アプリケーションが既に実行中の場合、Main メソッドを終了する
+                return;
             }
 
-            isRunning = true; // アプリケーションが実行中であることを示すフラグを設定
+            isRunning = true;
+
+            if (IsAlreadyRunning())
+            {
+                return;
+            }
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm());
 
-            isRunning = false; // アプリケーションが終了したらフラグをリセットする
+            isRunning = false;
+        }
+
+        private static bool IsAlreadyRunning()
+        {
+            string currentProcessName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+            System.Diagnostics.Process[] processes = System.Diagnostics.Process.GetProcessesByName(currentProcessName);
+            return processes.Length > 1;
         }
     }
 }
