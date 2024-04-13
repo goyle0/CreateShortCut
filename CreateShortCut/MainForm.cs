@@ -11,7 +11,15 @@ namespace CreateShortCut
         {
             InitializeComponent();
             InitializeComboBox();
-            LinkTxt.Focus(); 
+            LinkTxt.Focus();
+           // フォームの境界スタイルをFixedSingleに設定します
+           this.FormBorderStyle = FormBorderStyle.FixedSingle;
+           // 最大化ボタンを無効にします
+           this.MaximizeBox = false;
+           // 最小化ボタンを無効にします
+           this.MinimizeBox = false;
+           // フォームを画面の中央に配置します
+           this.StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void InitializeComboBox()
