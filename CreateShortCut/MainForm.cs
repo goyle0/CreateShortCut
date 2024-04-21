@@ -1,5 +1,4 @@
-﻿using IWshRuntimeLibrary;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows.Forms;
 
@@ -12,14 +11,14 @@ namespace CreateShortCut
             InitializeComponent();
             InitializeComboBox();
             LinkTxt.Focus();
-           // フォームの境界スタイルをFixedSingleに設定します
-           this.FormBorderStyle = FormBorderStyle.FixedSingle;
-           // 最大化ボタンを無効にします
-           this.MaximizeBox = false;
-           // 最小化ボタンを無効にします
-           this.MinimizeBox = false;
-           // フォームを画面の中央に配置します
-           this.StartPosition = FormStartPosition.CenterScreen;
+            // フォームの境界スタイルをFixedSingleに設定します
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            // 最大化ボタンを無効にします
+            this.MaximizeBox = false;
+            // 最小化ボタンを無効にします
+            this.MinimizeBox = false;
+            // フォームを画面の中央に配置します
+            this.StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void InitializeComboBox()
@@ -71,26 +70,17 @@ namespace CreateShortCut
         {
             string selectedPath = SaveFolderCmb.SelectedItem.ToString();
 
-            // 指定された場所にショートカットファイルを生成する
-            CreateShortcut(selectedPath);
+            if (string.IsNullOrEmpty(LinkTxt.Text) || string.IsNullOrEmpty(NameTxt.Text))
+            {
+                MessageBox.Show("リンクとショートカット名を入力してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+                // 指定された場所にショートカットファイルを生成する
+                CreateShortcut(selectedPath);
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData == (Keys.Tab | Keys.Enter))
-            {
-                // タブとエンターキーが押された場合、選択先を変更します
-                // TODO: 選択先の変更処理を実装する
-
-                // クリック処理を実行する
-                if (!string.IsNullOrEmpty(LinkTxt.Text) && !string.IsNullOrEmpty(NameTxt.Text))
-                {
-                    CreateBtn_Click(this, EventArgs.Empty);
-                }
-
-                return true;
-            }
-
             return base.ProcessCmdKey(ref msg, keyData);
         }
     }
