@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Windows.Forms;
 
@@ -19,11 +20,20 @@ namespace CreateShortCut
             this.MinimizeBox = false;
             // フォームを画面の中央に配置します
             this.StartPosition = FormStartPosition.CenterScreen;
+
+            // TabIndexを設定します
+            SaveFolderCmb.TabIndex = 0;
+            LinkTxt.TabIndex = 1;
+            NameTxt.TabIndex = 2;
+            SettingBtn.TabIndex = 3;
+            CreateBtn.TabIndex = 4;
         }
 
         private void InitializeComboBox()
         {
-            string path = @"C:\Users\fsyou";
+            string path = ConfigurationManager.AppSettings["FolderPath"];
+
+            SaveFolderCmb.Items.Clear();
 
             try
             {
@@ -41,7 +51,7 @@ namespace CreateShortCut
             finally
             {
                 // ComboBoxのデフォルト値を設定します
-                SaveFolderCmb.SelectedItem = @"C:\Users\fsyou\ShortCut";
+                SaveFolderCmb.SelectedItem = ConfigurationManager.AppSettings["DefaultPath"];
             }
         }
 
@@ -75,13 +85,24 @@ namespace CreateShortCut
                 MessageBox.Show("リンクとショートカット名を入力してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-                // 指定された場所にショートカットファイルを生成する
-                CreateShortcut(selectedPath);
+            // 指定された場所にショートカットファイルを生成する
+            CreateShortcut(selectedPath);
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void FolderBtn_Click(object sender, EventArgs e)
+        {
+            // SettingFormをインスタンス化して表示する
+            using (var settingForm = new SettingForm())
+            {
+                settingForm.ShowDialog();
+                InitializeComboBox(); // 画面情報を更新するためにInitializeComboBoxメソッドを呼び出す
+                LinkTxt.Focus();
+            }
         }
     }
 }
