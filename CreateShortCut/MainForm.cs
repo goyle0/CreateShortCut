@@ -27,6 +27,9 @@ namespace CreateShortCut
             NameTxt.TabIndex = 2;
             SettingBtn.TabIndex = 3;
             CreateBtn.TabIndex = 4;
+
+            // EnterキーでCreateBtn_Clickが実行されるように設定
+            this.AcceptButton = CreateBtn;
         }
 
         private void InitializeComboBox()

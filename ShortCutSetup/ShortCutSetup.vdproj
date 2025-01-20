@@ -15,8 +15,26 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_22610A95F89C49A89B8043646A4CA0C9"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_495373B82ED665621503ACE53EB1AB70"
+        "OwnerKey" = "8:_22610A95F89C49A89B8043646A4CA0C9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7178B05130474AC6B95B66F94FFDF3E4"
+        "OwnerKey" = "8:_22610A95F89C49A89B8043646A4CA0C9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_495373B82ED665621503ACE53EB1AB70"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -37,6 +55,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
+            }
         }
         "Release"
         {
@@ -53,65 +87,81 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
+            }
         }
     }
     "Deployable"
     {
         "CustomAction"
         {
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_4815C0439B114C2998F5685E4E327E74"
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_1ACD21FC5BCC435B8D145AA0F3BCDD6C"
             {
             "Name" = "8:プライマリ出力 from CreateShortCut (Active)"
             "Condition" = "8:"
-            "Object" = "8:_7178B05130474AC6B95B66F94FFDF3E4"
-            "FileType" = "3:2"
-            "InstallAction" = "3:2"
-            "Arguments" = "8:"
-            "EntryPoint" = "8:"
-            "Sequence" = "3:1"
-            "Identifier" = "8:_8C25EE1E_C6FF_44ED_8E3C_2CAA33611392"
-            "InstallerClass" = "11:TRUE"
-            "CustomActionData" = "8:"
-            }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_5564D95466E643728A0FA13780EDCAA0"
-            {
-            "Name" = "8:プライマリ出力 from CreateShortCut (Active)"
-            "Condition" = "8:"
-            "Object" = "8:_7178B05130474AC6B95B66F94FFDF3E4"
-            "FileType" = "3:2"
-            "InstallAction" = "3:1"
-            "Arguments" = "8:"
-            "EntryPoint" = "8:"
-            "Sequence" = "3:1"
-            "Identifier" = "8:_45E22899_DA2F_4577_B233_67B5FEB83DFF"
-            "InstallerClass" = "11:TRUE"
-            "CustomActionData" = "8:"
-            }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_5A7FBDB32597453FBE352DE773F42FED"
-            {
-            "Name" = "8:プライマリ出力 from CreateShortCut (Active)"
-            "Condition" = "8:"
-            "Object" = "8:_7178B05130474AC6B95B66F94FFDF3E4"
+            "Object" = "8:_22610A95F89C49A89B8043646A4CA0C9"
             "FileType" = "3:2"
             "InstallAction" = "3:4"
             "Arguments" = "8:"
             "EntryPoint" = "8:"
             "Sequence" = "3:1"
-            "Identifier" = "8:_690DA36A_93E6_4AA6_91EB_799E877641C2"
+            "Identifier" = "8:_5378D230_A791_4DD7_8E4B_8285082D78C5"
             "InstallerClass" = "11:TRUE"
             "CustomActionData" = "8:"
             }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_FA4B857E5B724166904C31A830B35840"
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_6D162CE574E440D18F563B2B1486C20B"
             {
             "Name" = "8:プライマリ出力 from CreateShortCut (Active)"
             "Condition" = "8:"
-            "Object" = "8:_7178B05130474AC6B95B66F94FFDF3E4"
+            "Object" = "8:_22610A95F89C49A89B8043646A4CA0C9"
+            "FileType" = "3:2"
+            "InstallAction" = "3:2"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_212C6006_F267_4A16_84A2_B928737211F7"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_927B20A769974487BAB8A356A093D64F"
+            {
+            "Name" = "8:プライマリ出力 from CreateShortCut (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_22610A95F89C49A89B8043646A4CA0C9"
             "FileType" = "3:2"
             "InstallAction" = "3:3"
             "Arguments" = "8:"
             "EntryPoint" = "8:"
             "Sequence" = "3:1"
-            "Identifier" = "8:_4EF49207_BBC9_4C27_9280_0C975C096983"
+            "Identifier" = "8:_AF290CDC_7986_4C13_B94D_ECD099CD6CF6"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_D6E5D9C75C824F92BCE695FF507A6412"
+            {
+            "Name" = "8:プライマリ出力 from CreateShortCut (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_22610A95F89C49A89B8043646A4CA0C9"
+            "FileType" = "3:2"
+            "InstallAction" = "3:1"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_C05719DF_AECA_4A8A_9D29_E4485CC6F6FF"
             "InstallerClass" = "11:TRUE"
             "CustomActionData" = "8:"
             }
@@ -138,6 +188,37 @@
         }
         "File"
         {
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_495373B82ED665621503ACE53EB1AB70"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:System.Net.Http, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+                "ScatterAssemblies"
+                {
+                    "_495373B82ED665621503ACE53EB1AB70"
+                    {
+                    "Name" = "8:System.Net.Http.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:System.Net.Http.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CF075F1B83BC473ABE4987E52352BFAD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -194,15 +275,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ShortCut"
-        "ProductCode" = "8:{708780CB-B081-4DB9-9B1F-A95FF959E808}"
-        "PackageCode" = "8:{2C0F5A1B-760B-47BD-A579-7F4A5431916F}"
+        "ProductCode" = "8:{B7B1F997-28BC-407F-8AC6-334851C31E0D}"
+        "PackageCode" = "8:{65A5323E-8CA4-40D4-B537-AD69D91B0D9A}"
         "UpgradeCode" = "8:{3FC88713-A107-4B62-A289-8B0086133964}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:2.0.1"
         "Manufacturer" = "8:Own"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -714,9 +795,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_7178B05130474AC6B95B66F94FFDF3E4"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_22610A95F89C49A89B8043646A4CA0C9"
             {
-            "SourcePath" = "8:..\\CreateShortCut\\obj\\Release\\CreateShortCut.exe"
+            "SourcePath" = "8:..\\CreateShortCut\\obj\\Debug\\CreateShortCut.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CF075F1B83BC473ABE4987E52352BFAD"
