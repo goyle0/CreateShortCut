@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace CreateShortCut
@@ -258,7 +259,7 @@ namespace CreateShortCut
             try
             {
                 string testFile = Path.Combine(directoryPath, "test_write_access.tmp");
-                File.WriteAllText(testFile, "test");
+                File.WriteAllText(testFile, "test", Encoding.GetEncoding("Shift_JIS"));
                 File.Delete(testFile);
                 return true;
             }
@@ -279,7 +280,7 @@ namespace CreateShortCut
                     Directory.CreateDirectory(directory);
                 }
                 
-                File.AppendAllText(logPath, logMessage);
+                File.AppendAllText(logPath, logMessage, Encoding.GetEncoding("Shift_JIS"));
                 return true;
             }
             catch

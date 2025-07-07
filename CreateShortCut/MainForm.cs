@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace CreateShortCut
@@ -108,8 +109,8 @@ namespace CreateShortCut
                 // URLファイルの内容を作成
                 string urlFileContent = $"[InternetShortcut]{Environment.NewLine}URL={LinkTxt.Text}";
 
-                // URLファイルを作成
-                System.IO.File.WriteAllText(urlFilePath, urlFileContent);
+                // URLファイルを作成（日本語文字化け防止のためShift-JISエンコーディングを使用）
+                System.IO.File.WriteAllText(urlFilePath, urlFileContent, Encoding.GetEncoding("Shift_JIS"));
 
                 MessageBox.Show(".urlファイルが作成されました。", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -233,7 +234,7 @@ namespace CreateShortCut
                     Directory.CreateDirectory(directory);
                 }
                 
-                File.AppendAllText(logPath, logMessage);
+                File.AppendAllText(logPath, logMessage, Encoding.GetEncoding("Shift_JIS"));
                 return true;
             }
             catch
