@@ -85,10 +85,6 @@
     <EmbeddedResource Include="SettingForm.resx">
       <DependentUpon>SettingForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include=".claude\settings.local.json" />
-    <None Include="CLAUDE.md" />
-    <None Include="history\2025-07-12_CLAUDE.md開発手順追加.md" />
-    <None Include="history\2025-07-12_ユーザー承認プロセス追加.md" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

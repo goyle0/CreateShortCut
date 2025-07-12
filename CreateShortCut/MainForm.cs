@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -27,8 +28,9 @@ namespace CreateShortCut
             SaveFolderCmb.TabIndex = 0;
             LinkTxt.TabIndex = 1;
             NameTxt.TabIndex = 2;
-            SettingBtn.TabIndex = 3;
-            CreateBtn.TabIndex = 4;
+            OpenFolderBtn.TabIndex = 3;
+            SettingBtn.TabIndex = 4;
+            CreateBtn.TabIndex = 5;
 
             // EnterキーでCreateBtn_Clickが実行されるように設定
             this.AcceptButton = CreateBtn;
@@ -147,6 +149,37 @@ namespace CreateShortCut
                 settingForm.ShowDialog();
                 InitializeComboBox(); // 画面情報を更新するためにInitializeComboBoxメソッドを呼び出す
                 LinkTxt.Focus();
+            }
+        }
+
+        private void OpenFolderBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 選択されているフォルダパスを取得
+                if (SaveFolderCmb.SelectedItem == null)
+                {
+                    MessageBox.Show("保存先フォルダが選択されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                string selectedPath = SaveFolderCmb.SelectedItem.ToString();
+
+                // フォルダの存在確認
+                if (!Directory.Exists(selectedPath))
+                {
+                    LogError($"選択されたフォルダが存在しません: {selectedPath}");
+                    MessageBox.Show($"選択されたフォルダが存在しません:\n{selectedPath}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // エクスプローラーでフォルダを開く
+                Process.Start("explorer.exe", selectedPath);
+            }
+            catch (Exception ex)
+            {
+                LogError($"フォルダを開く際にエラーが発生しました: {ex.Message}", ex);
+                MessageBox.Show($"フォルダを開く際にエラーが発生しました:\n{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
