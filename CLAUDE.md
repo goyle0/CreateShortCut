@@ -22,11 +22,14 @@ CreateShortCutは、C#（.NET Framework 4.8）で書かれたWindows Formsアプ
   - Windows Internet Shortcut形式を使用した.urlファイル作成
   - 入力検証とエラーログ処理
   - 日本語文字サポートのためのShift-JISエンコーディング使用
+  - **デフォルトパス存在チェック機能**: 起動時にApp.config内のDefaultPathの存在を確認し、未設定または存在しない場合は適切なガイダンスメッセージを表示
+  - **管理者権限状況判定**: IsRunningAsAdministrator()メソッドにより現在の実行権限を判定し、設定変更に必要な管理者権限の案内を動的に表示
 
 - **SettingForm**: フォルダパスの設定インターフェース
   - フォルダパスとデフォルト選択でApp.configファイルを更新
   - ディレクトリアクセス権限の検証
-  - 設定ファイル変更には管理者権限が必要
+  - **管理者権限事前チェック**: 設定保存前にIsRunningAsAdministrator()メソッドで管理者権限を確認し、権限不足時は保存処理を中止して適切なエラーメッセージを表示
+  - **ファイル書き込み権限検証**: App.configファイルへの書き込み権限をHasFileWriteAccess()メソッドで事前確認
 
 ## 主要な技術詳細
 
@@ -35,17 +38,21 @@ CreateShortCutは、C#（.NET Framework 4.8）で書かれたWindows Formsアプ
 - **COM参照**: WindowsショートカットファンクションのためIWshRuntimeLibraryを使用
 - **エラー処理**: 複数のフォールバックログ場所を持つ包括的なエラーログ
 - **権限処理**: 操作前にディレクトリとファイルアクセスを検証
+- **管理者権限チェック**: 設定保存時の管理者権限確認機能（WindowsIdentity/WindowsPrincipal使用）
+- **デフォルトパス検証**: アプリ起動時のデフォルトパス存在確認とユーザーガイダンス機能
 - **単一インスタンス**: アプリケーションの複数インスタンス実行を防止
 
 ## 設定構造
 
 App.configファイルには以下が含まれます：
+
 - `FolderPath`: サブディレクトリをスキャンするルートディレクトリ
 - `DefaultPath`: ショートカット作成のデフォルト選択フォルダ
 
 ## エラーログ
 
 アプリケーションは以下の優先順序で複数の場所にエラーログの書き込みを試行します：
+
 1. アプリケーション起動パス（`error.log`）
 2. ユーザーのドキュメントフォルダ（`CreateShortCut_error.log`）
 3. ユーザーのAppDataフォルダ（`CreateShortCut\error.log`）
@@ -59,13 +66,39 @@ App.configファイルには以下が含まれます：
 - フォームは固定サイズ、中央配置ダイアログとして設定
 - 重複インスタンス検出によりアプリケーションの複数起動を防止
 
+## セキュリティ・権限管理機能詳細
+
+### 管理者権限チェック機能
+- **実装場所**: MainForm.cs、SettingForm.cs共通メソッド `IsRunningAsAdministrator()`
+- **実装方法**: `System.Security.Principal`名前空間の`WindowsIdentity`と`WindowsPrincipal`クラスを使用
+- **動作原理**: 現在のプロセスの実行ユーザーが`WindowsBuiltInRole.Administrator`ロールに属しているかを確認
+- **使用タイミング**: 
+  - MainForm起動時: デフォルトパス未設定警告メッセージの内容決定
+  - SettingForm保存時: 設定変更処理の実行可否判定
+
+### デフォルトパス存在チェック機能
+- **実装場所**: MainForm.cs `InitializeComboBox()`メソッド内
+- **チェック内容**: 
+  - App.config内`DefaultPath`設定値の`null`/空文字列チェック
+  - 指定パスの物理的存在確認（`Directory.Exists()`使用）
+  - ComboBox内アイテムとの一致確認
+- **警告表示条件**: デフォルトパスが未設定、または物理的に存在しない場合
+- **メッセージ内容**: 
+  - 基本メッセージ: 設定画面での設定を促す案内
+  - 動的追加: 管理者権限未実行時は管理者権限での再起動案内を併記
+
+### ファイル書き込み権限検証
+- **実装場所**: SettingForm.cs `HasFileWriteAccess()`メソッド
+- **検証方法**: App.configファイルに対してFileMode.Open、FileAccess.Writeでの一時アクセステスト
+- **フォールバック処理**: 権限不足時はUnauthorizedAccessExceptionをキャッチし、適切なエラーメッセージを表示
+
 ## 開発手順（Claude Code向け指示）
 
 Claude Codeによる開発作業では、以下の手順を必ず守ること：
 
 ### 作業前の必須プロセス
 
-1. **計画立案**: 必ずultra thinking機能を使用して詳細な計画を立てる
+1. **計画立案**: 必ずultrathinking機能を使用して詳細な計画を立てる
 2. **計画の明示**: 計画後に日本語で箇条書きにて実施内容をわかりやすく記載する
 3. **ユーザー承認**: 計画を提示した後、必ずユーザーに「この内容で実施してよろしいでしょうか？」と確認し、承認を得てから作業を開始する
 4. **履歴管理**: 全ての計画と実施内容を`history/`フォルダに保存する
