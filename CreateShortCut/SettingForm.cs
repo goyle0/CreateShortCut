@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Windows.Forms;
 
@@ -45,6 +46,15 @@ namespace CreateShortCut
                 MessageBox.Show("フォルダパスとデフォルトのフォルダ設定を入力してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            // 管理者権限チェック
+            if (!IsRunningAsAdministrator())
+            {
+                LogError("設定保存には管理者権限が必要です");
+                MessageBox.Show("設定の保存には管理者権限が必要です。\nこのアプリを管理者として再度起動してください。", "管理者権限が必要", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
                 // App.configのパス設定を更新
@@ -323,6 +333,20 @@ namespace CreateShortCut
             sb.AppendLine();
             
             return sb.ToString();
+        }
+
+        private bool IsRunningAsAdministrator()
+        {
+            try
+            {
+                WindowsIdentity identity = WindowsIdentity.GetCurrent();
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

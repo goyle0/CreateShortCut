@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Windows.Forms;
 
@@ -90,13 +91,21 @@ namespace CreateShortCut
             {
                 // デフォルトパスの設定
                 string defaultPath = ConfigurationManager.AppSettings["DefaultPath"];
-                if (SaveFolderCmb.Items.Contains(defaultPath))
+                if (!string.IsNullOrEmpty(defaultPath) && Directory.Exists(defaultPath) && SaveFolderCmb.Items.Contains(defaultPath))
                 {
                     SaveFolderCmb.SelectedItem = defaultPath;
                 }
                 else if (SaveFolderCmb.Items.Count > 0)
                 {
                     SaveFolderCmb.SelectedIndex = 0;
+                }
+                
+                // デフォルトパスが設定されていないか存在しない場合の警告
+                if (string.IsNullOrEmpty(defaultPath) || !Directory.Exists(defaultPath))
+                {
+                    string adminWarning = IsRunningAsAdministrator() ? "" : "\n\nなお、設定の保存には管理者権限が必要です。このアプリを管理者として再起動することをお勧めします。";
+                    LogError($"デフォルトパスが設定されていないか、存在しません: {defaultPath}");
+                    MessageBox.Show($"デフォルトパスが設定されていないか、存在しません。\n設定画面でデフォルトパスを設定してください。{adminWarning}", "設定が必要", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
@@ -310,6 +319,20 @@ namespace CreateShortCut
             sb.AppendLine();
             
             return sb.ToString();
+        }
+
+        private bool IsRunningAsAdministrator()
+        {
+            try
+            {
+                WindowsIdentity identity = WindowsIdentity.GetCurrent();
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
