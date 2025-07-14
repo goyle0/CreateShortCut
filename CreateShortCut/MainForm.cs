@@ -11,8 +11,11 @@ namespace CreateShortCut
 {
     public partial class MainForm : Form
     {
+        private readonly IConfigurationService _configService;
+        
         public MainForm()
         {
+            _configService = new ConfigurationService();
             InitializeComponent();
             InitializeComboBox();
             LinkTxt.Focus();
@@ -39,7 +42,7 @@ namespace CreateShortCut
 
         private void InitializeComboBox()
         {
-            string path = ConfigurationManager.AppSettings["FolderPath"];
+            string path = _configService.GetFolderPath();
 
             SaveFolderCmb.Items.Clear();
 
@@ -48,7 +51,7 @@ namespace CreateShortCut
                 // パスの存在確認
                 if (!Directory.Exists(path))
                 {
-                    LogError($"指定されたフォルダパスが存在しません: {path}");
+                    LoggingUtility.LogError($"指定されたフォルダパスが存在しません: {path}");
                     MessageBox.Show($"指定されたフォルダパスが存在しません: {path}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
@@ -56,7 +59,7 @@ namespace CreateShortCut
                 // アクセス権限の確認
                 if (!HasDirectoryAccess(path))
                 {
-                    LogError($"フォルダパスへのアクセス権限がありません: {path}");
+                    LoggingUtility.LogError($"フォルダパスへのアクセス権限がありません: {path}");
                     MessageBox.Show($"フォルダパスへのアクセス権限がありません: {path}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
@@ -69,28 +72,28 @@ namespace CreateShortCut
             }
             catch (UnauthorizedAccessException ex)
             {
-                LogError($"アクセス拒否エラー: {ex.Message}", ex);
+                LoggingUtility.LogError($"アクセス拒否エラー: {ex.Message}", ex);
                 MessageBox.Show($"アクセス拒否: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (DirectoryNotFoundException ex)
             {
-                LogError($"ディレクトリが見つかりません: {ex.Message}", ex);
+                LoggingUtility.LogError($"ディレクトリが見つかりません: {ex.Message}", ex);
                 MessageBox.Show($"ディレクトリが見つかりません: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (IOException ex)
             {
-                LogError($"IO エラー: {ex.Message}", ex);
+                LoggingUtility.LogError($"IO エラー: {ex.Message}", ex);
                 MessageBox.Show($"IO エラー: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                LogError($"予期しないエラー: {ex.Message}", ex);
+                LoggingUtility.LogError($"予期しないエラー: {ex.Message}", ex);
                 MessageBox.Show($"予期しないエラー: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
                 // デフォルトパスの設定
-                string defaultPath = ConfigurationManager.AppSettings["DefaultPath"];
+                string defaultPath = _configService.GetDefaultPath();
                 if (!string.IsNullOrEmpty(defaultPath) && Directory.Exists(defaultPath) && SaveFolderCmb.Items.Contains(defaultPath))
                 {
                     SaveFolderCmb.SelectedItem = defaultPath;
@@ -104,7 +107,7 @@ namespace CreateShortCut
                 if (string.IsNullOrEmpty(defaultPath) || !Directory.Exists(defaultPath))
                 {
                     string adminWarning = IsRunningAsAdministrator() ? "" : "\n\nなお、設定の保存には管理者権限が必要です。このアプリを管理者として再起動することをお勧めします。";
-                    LogError($"デフォルトパスが設定されていないか、存在しません: {defaultPath}");
+                    LoggingUtility.LogError($"デフォルトパスが設定されていないか、存在しません: {defaultPath}");
                     MessageBox.Show($"デフォルトパスが設定されていないか、存在しません。\n設定画面でデフォルトパスを設定してください。{adminWarning}", "設定が必要", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
@@ -127,18 +130,32 @@ namespace CreateShortCut
             }
             catch (Exception ex)
             {
-                LogError($"ショートカット作成エラー: {ex.Message}", ex);
+                LoggingUtility.LogError($"ショートカット作成エラー: {ex.Message}", ex);
                 MessageBox.Show("ショートカットの作成中にエラーが発生しました。\n\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void CreateBtn_Click(object sender, EventArgs e)
         {
+            if (SaveFolderCmb.SelectedItem == null)
+            {
+                MessageBox.Show("保存先フォルダを選択してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            
             string selectedPath = SaveFolderCmb.SelectedItem.ToString();
 
             if (string.IsNullOrEmpty(LinkTxt.Text) || string.IsNullOrEmpty(NameTxt.Text))
             {
                 MessageBox.Show("リンクとショートカット名を入力してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            
+            // URL形式の検証
+            if (!Uri.TryCreate(LinkTxt.Text, UriKind.Absolute, out Uri uriResult) || 
+                (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
+            {
+                MessageBox.Show("正しいURL形式を入力してください。\n（例：https://example.com）", "URL形式エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             // 指定された場所にショートカットファイルを生成する
@@ -177,7 +194,7 @@ namespace CreateShortCut
                 // フォルダの存在確認
                 if (!Directory.Exists(selectedPath))
                 {
-                    LogError($"選択されたフォルダが存在しません: {selectedPath}");
+                    LoggingUtility.LogError($"選択されたフォルダが存在しません: {selectedPath}");
                     MessageBox.Show($"選択されたフォルダが存在しません:\n{selectedPath}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
@@ -187,7 +204,7 @@ namespace CreateShortCut
             }
             catch (Exception ex)
             {
-                LogError($"フォルダを開く際にエラーが発生しました: {ex.Message}", ex);
+                LoggingUtility.LogError($"フォルダを開く際にエラーが発生しました: {ex.Message}", ex);
                 MessageBox.Show($"フォルダを開く際にエラーが発生しました:\n{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -209,117 +226,6 @@ namespace CreateShortCut
             }
         }
 
-        private void LogError(string message)
-        {
-            LogError(message, null);
-        }
-        
-        private void LogError(string message, Exception ex)
-        {
-            try
-            {
-                string logMessage = FormatLogMessage(message, ex);
-                
-                // 複数のパスを試す
-                string[] logPaths = {
-                    Path.Combine(Application.StartupPath, "error.log"),
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CreateShortCut_error.log"),
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CreateShortCut", "error.log"),
-                    Path.Combine(Path.GetTempPath(), "CreateShortCut_error.log")
-                };
-                
-                bool logWritten = false;
-                foreach (string logPath in logPaths)
-                {
-                    if (TryWriteLog(logPath, logMessage))
-                    {
-                        logWritten = true;
-                        break;
-                    }
-                }
-                
-                // ログが書けなかった場合のデバッグ情報表示
-                if (!logWritten)
-                {
-                    MessageBox.Show($"ログファイルへの書き込みに失敗しました。\n\nエラー情報:\n{message}\n\n試したパス:\n{string.Join("\n", logPaths)}", "ログ書き込みエラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-            catch
-            {
-                // 最終的なフォールバック
-            }
-        }
-        
-        private bool HasDirectoryWriteAccess(string directoryPath)
-        {
-            try
-            {
-                string testFile = Path.Combine(directoryPath, "test_write_access.tmp");
-                File.WriteAllText(testFile, "test");
-                File.Delete(testFile);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-        
-        private bool TryWriteLog(string logPath, string logMessage)
-        {
-            try
-            {
-                // ディレクトリが存在しない場合は作成する
-                string directory = Path.GetDirectoryName(logPath);
-                if (!Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
-                
-                File.AppendAllText(logPath, logMessage, Encoding.GetEncoding("Shift_JIS"));
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-        
-        private string FormatLogMessage(string message, Exception ex)
-        {
-            var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {message}");
-            
-            if (ex != null)
-            {
-                sb.AppendLine($"Exception Type: {ex.GetType().FullName}");
-                sb.AppendLine($"Message: {ex.Message}");
-                sb.AppendLine($"Stack Trace: {ex.StackTrace}");
-                
-                if (ex.InnerException != null)
-                {
-                    sb.AppendLine($"Inner Exception: {ex.InnerException.GetType().FullName}");
-                    sb.AppendLine($"Inner Message: {ex.InnerException.Message}");
-                    sb.AppendLine($"Inner Stack Trace: {ex.InnerException.StackTrace}");
-                }
-                
-                sb.AppendLine($"Source: {ex.Source}");
-                sb.AppendLine($"Target Site: {ex.TargetSite}");
-                sb.AppendLine($"Help Link: {ex.HelpLink}");
-                sb.AppendLine($"Data: {string.Join(", ", ex.Data.Cast<System.Collections.DictionaryEntry>().Select(kvp => $"{kvp.Key}={kvp.Value}"))}");
-            }
-            
-            sb.AppendLine($"Application Path: {Application.StartupPath}");
-            sb.AppendLine($"Working Directory: {Directory.GetCurrentDirectory()}");
-            sb.AppendLine($"User: {Environment.UserName}");
-            sb.AppendLine($"Machine: {Environment.MachineName}");
-            sb.AppendLine($"OS Version: {Environment.OSVersion}");
-            sb.AppendLine($"CLR Version: {Environment.Version}");
-            sb.AppendLine("----------------------------------------");
-            sb.AppendLine();
-            
-            return sb.ToString();
-        }
 
         private bool IsRunningAsAdministrator()
         {
