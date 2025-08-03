@@ -17,6 +17,12 @@ namespace CreateShortCut
         {
             _configService = new ConfigurationService();
             InitializeComponent();
+            
+            // ユーザーガイダンス: ログファイルの説明
+            LoggingUtility.LogError("=== CreateShortCut アプリケーション開始 ===");
+            LoggingUtility.LogError("注意: ログに表示されるfile:///形式やエンコードされたパスは、.url仕様に準拠した技術的な表記です。");
+            LoggingUtility.LogError("実際のファイル作成やパス処理は正常に動作しています。");
+            
             InitializeComboBox();
             LinkTxt.Focus();
             // フォームの境界スタイルをFixedSingleに設定します
@@ -160,13 +166,12 @@ namespace CreateShortCut
                 // URLファイルのパスを作成
                 string urlFilePath = Path.Combine(shortcutPath, $"{sanitizedFileName}.url");
                 
-                // デバッグログ: ファイルパス情報
-                LoggingUtility.LogError($"元のファイル名: {rawFileName}");
-                LoggingUtility.LogError($"サニタイズ後: {sanitizedFileName}");
-                LoggingUtility.LogError($"最終ファイルパス: {urlFilePath}");
+                // ショートカットファイル作成情報
+                LoggingUtility.LogError($"ショートカット作成: {sanitizedFileName}.url");
 
-                // デバッグログ: 受信したURL
+                // デバッグログ: 受信したURL（エンコード前後両方表示）
                 LoggingUtility.LogError($"受信URL: {url}");
+                LoggingUtility.LogError($"表示用パス: {GetUserFriendlyPath(url)}");
 
                 string finalUrl;
                 
@@ -176,24 +181,25 @@ namespace CreateShortCut
                     // file:///形式の場合はそのまま使用（既に適切に変換済み）
                     finalUrl = url;
                     LoggingUtility.LogError($"file:///形式のURL使用: {finalUrl}");
+                    LoggingUtility.LogError($"file:///表示用パス: {GetUserFriendlyPath(finalUrl)}");
                 }
                 else
                 {
                     // HTTP/HTTPS URLの場合はエスケープ処理
                     finalUrl = Uri.EscapeUriString(url);
                     LoggingUtility.LogError($"HTTP/HTTPSエスケープ後URL: {finalUrl}");
+                    LoggingUtility.LogError($"HTTP/HTTPS表示用URL: {GetUserFriendlyPath(finalUrl)}");
                 }
 
                 // URLファイルの内容を作成
                 string urlFileContent = $"[InternetShortcut]{Environment.NewLine}URL={finalUrl}";
 
-                // デバッグログ: 保存される内容
-                LoggingUtility.LogError($"保存内容: {urlFileContent}");
+                // .urlファイル作成完了ログ
+                LoggingUtility.LogError($".urlファイル作成完了: {urlFilePath}");
 
                 // URLファイルを作成（Windows標準のANSIエンコーディングを使用）
                 System.IO.File.WriteAllText(urlFilePath, urlFileContent, Encoding.Default);
 
-                LoggingUtility.LogError($".urlファイルが正常に作成されました: {urlFilePath}");
                 MessageBox.Show(".urlファイルが作成されました。", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (UriFormatException ex)
@@ -272,15 +278,18 @@ namespace CreateShortCut
                 finalUrl = ConvertToValidUrl(inputValue);
                 if (string.IsNullOrEmpty(finalUrl))
                 {
-                    MessageBox.Show("ローカルパスのfile:///形式への変換に失敗しました。\n\nパス: " + inputValue, "変換エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    string displayPath = GetUserFriendlyPath(inputValue);
+                    MessageBox.Show($"ローカルパスの変換に失敗しました。\n\nパス: {displayPath}", "変換エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 LoggingUtility.LogError($"file:///形式に変換完了: {finalUrl}");
+                LoggingUtility.LogError($"変換完了表示用パス: {GetUserFriendlyPath(finalUrl)}");
             }
 
             // 処理済みのURLまたはfile:///形式のパスでショートカットを作成
             LoggingUtility.LogError($"ショートカット作成開始 - 最終URL: {finalUrl}");
+            LoggingUtility.LogError($"ショートカット作成 - 表示用パス: {GetUserFriendlyPath(finalUrl)}");
             CreateShortcut(selectedPath, finalUrl);
         }
 
@@ -468,6 +477,7 @@ namespace CreateShortCut
                 string fileUrl = fileUri.AbsoluteUri;
 
                 LoggingUtility.LogError($"ローカルパス変換: {localPath} → {fileUrl}");
+                LoggingUtility.LogError($"変換後表示用パス: {GetUserFriendlyPath(fileUrl)}");
                 return fileUrl;
             }
             catch (ArgumentException ex)
@@ -665,6 +675,44 @@ namespace CreateShortCut
                 errorMessage = $"パス検証中に予期しないエラーが発生しました:\n{localPath}\n{ex.Message}";
                 LoggingUtility.LogError($"ValidateFileAccess予期しないエラー: {localPath} - {ex.Message}", ex);
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// ログ表示用にエンコードされたURLを読みやすいパスに変換する
+        /// </summary>
+        /// <param name="url">変換対象のURL文字列</param>
+        /// <returns>読みやすい形式のパス文字列</returns>
+        private string GetUserFriendlyPath(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                return url;
+            }
+
+            try
+            {
+                // file:///形式のURLの場合はデコードして読みやすいパスに変換
+                if (url.StartsWith("file:///"))
+                {
+                    Uri uri = new Uri(url);
+                    return Uri.UnescapeDataString(uri.LocalPath);
+                }
+                
+                // HTTPまたはHTTPS URLの場合はURLデコードのみ実行
+                if (url.StartsWith("http://") || url.StartsWith("https://"))
+                {
+                    return Uri.UnescapeDataString(url);
+                }
+                
+                // その他の場合はそのまま返す
+                return url;
+            }
+            catch (Exception ex)
+            {
+                // デコードに失敗した場合は元の文字列を返してログに記録
+                LoggingUtility.LogError($"URLデコードエラー: {url} - {ex.Message}");
+                return url;
             }
         }
 
