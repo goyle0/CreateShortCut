@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
@@ -12,6 +13,13 @@ namespace CreateShortCut
     public partial class MainForm : Form
     {
         private readonly IConfigurationService _configService;
+        
+        // サフィックス候補の辞書
+        private readonly Dictionary<string, string[]> _suffixCandidates = new Dictionary<string, string[]>
+        {
+            {"local", new[] { "local", "ローカル", "ろ", "ろーかる", "ro-karu", "ro-", "ろー" }},
+            {"remote", new[] { "Remote", "リモート", "り", "りもーと", "rimo-to", "rimoto", "rimo", "りもー", "りも" }}
+        };
         
         public MainForm()
         {
@@ -35,12 +43,20 @@ namespace CreateShortCut
             TypeGroupBox.TabIndex = 3;
             LocalRadioBtn.TabIndex = 4;
             RemoteRadioBtn.TabIndex = 5;
-            OpenFolderBtn.TabIndex = 6;
-            SettingBtn.TabIndex = 7;
-            CreateBtn.TabIndex = 8;
+            SuffixComboBox.TabIndex = 6;
+            OpenFolderBtn.TabIndex = 7;
+            SettingBtn.TabIndex = 8;
+            CreateBtn.TabIndex = 9;
 
             // EnterキーでCreateBtn_Clickが実行されるように設定
             this.AcceptButton = CreateBtn;
+            
+            // ラジオボタンのイベントハンドラーを追加
+            LocalRadioBtn.CheckedChanged += RadioButton_CheckedChanged;
+            RemoteRadioBtn.CheckedChanged += RadioButton_CheckedChanged;
+            
+            // 初期のサフィックス候補を設定（ローカルがデフォルト選択）
+            UpdateSuffixCandidates();
         }
 
         private void InitializeComboBox()
@@ -123,8 +139,11 @@ namespace CreateShortCut
                 // ラジオボタンの選択状態に基づいてプレフィックスを決定
                 string prefix = LocalRadioBtn.Checked ? "[Local]" : "[Remote]";
                 
-                // URLファイルのパスを作成（プレフィックス付き）
-                string urlFilePath = Path.Combine(shortcutPath, $"{prefix}{NameTxt.Text}.url");
+                // サフィックスを取得（選択されていない場合はデフォルト値）
+                string suffix = GetSelectedSuffix();
+                
+                // URLファイルのパスを作成（プレフィックス + ファイル名 + サフィックス付き）
+                string urlFilePath = Path.Combine(shortcutPath, $"{prefix}{NameTxt.Text}_{suffix}.url");
 
                 // デバッグログ: 受信したURL
                 LoggingUtility.LogError($"受信URL: {url}");
@@ -539,6 +558,72 @@ namespace CreateShortCut
                 LoggingUtility.LogError($"ValidateFileAccess予期しないエラー: {localPath} - {ex.Message}", ex);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// ラジオボタンの選択変更時にサフィックス候補を更新する
+        /// </summary>
+        private void RadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is RadioButton radioButton && radioButton.Checked)
+            {
+                UpdateSuffixCandidates();
+            }
+        }
+
+        /// <summary>
+        /// 選択されたラジオボタンに応じてサフィックス候補を更新する
+        /// </summary>
+        private void UpdateSuffixCandidates()
+        {
+            SuffixComboBox.Items.Clear();
+            
+            string[] candidates;
+            string defaultSelection;
+            
+            if (LocalRadioBtn.Checked)
+            {
+                candidates = _suffixCandidates["local"];
+                defaultSelection = "local";
+            }
+            else
+            {
+                candidates = _suffixCandidates["remote"];
+                defaultSelection = "Remote";
+            }
+            
+            SuffixComboBox.Items.AddRange(candidates);
+            
+            // デフォルト選択を設定
+            if (SuffixComboBox.Items.Contains(defaultSelection))
+            {
+                SuffixComboBox.SelectedItem = defaultSelection;
+            }
+            else if (SuffixComboBox.Items.Count > 0)
+            {
+                SuffixComboBox.SelectedIndex = 0;
+            }
+        }
+
+        /// <summary>
+        /// 選択されたサフィックスを取得する
+        /// </summary>
+        /// <returns>選択されたサフィックス、未選択の場合はデフォルト値</returns>
+        private string GetSelectedSuffix()
+        {
+            if (SuffixComboBox.SelectedItem != null)
+            {
+                return SuffixComboBox.SelectedItem.ToString();
+            }
+            
+            // 手動入力されたテキストがある場合
+            if (!string.IsNullOrWhiteSpace(SuffixComboBox.Text))
+            {
+                return SuffixComboBox.Text.Trim();
+            }
+            
+            // デフォルト値を返す
+            return LocalRadioBtn.Checked ? "local" : "Remote";
         }
     }
 }
