@@ -41,8 +41,6 @@
             this.TypeGroupBox = new System.Windows.Forms.GroupBox();
             this.RemoteRadioBtn = new System.Windows.Forms.RadioButton();
             this.LocalRadioBtn = new System.Windows.Forms.RadioButton();
-            this.SuffixComboBox = new System.Windows.Forms.ComboBox();
-            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // CreateBtn
@@ -50,10 +48,10 @@
             this.CreateBtn.BackColor = System.Drawing.Color.RoyalBlue;
             this.CreateBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.CreateBtn.Font = new System.Drawing.Font("MS UI Gothic", 15F);
-            this.CreateBtn.Location = new System.Drawing.Point(529, 343);
+            this.CreateBtn.Location = new System.Drawing.Point(529, 308);
             this.CreateBtn.Name = "CreateBtn";
             this.CreateBtn.Size = new System.Drawing.Size(188, 72);
-            this.CreateBtn.TabIndex = 9;
+            this.CreateBtn.TabIndex = 5;
             this.CreateBtn.Text = "作　成";
             this.CreateBtn.UseVisualStyleBackColor = false;
             this.CreateBtn.Click += new System.EventHandler(this.CreateBtn_Click);
@@ -119,10 +117,10 @@
             this.SettingBtn.BackColor = System.Drawing.Color.LightGreen;
             this.SettingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.SettingBtn.Font = new System.Drawing.Font("MS UI Gothic", 11F);
-            this.SettingBtn.Location = new System.Drawing.Point(316, 343);
+            this.SettingBtn.Location = new System.Drawing.Point(316, 308);
             this.SettingBtn.Name = "SettingBtn";
             this.SettingBtn.Size = new System.Drawing.Size(188, 72);
-            this.SettingBtn.TabIndex = 8;
+            this.SettingBtn.TabIndex = 4;
             this.SettingBtn.Text = "設　定";
             this.SettingBtn.UseVisualStyleBackColor = false;
             this.SettingBtn.Click += new System.EventHandler(this.FolderBtn_Click);
@@ -132,10 +130,10 @@
             this.OpenFolderBtn.BackColor = System.Drawing.Color.Orange;
             this.OpenFolderBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.OpenFolderBtn.Font = new System.Drawing.Font("MS UI Gothic", 11F);
-            this.OpenFolderBtn.Location = new System.Drawing.Point(103, 343);
+            this.OpenFolderBtn.Location = new System.Drawing.Point(103, 308);
             this.OpenFolderBtn.Name = "OpenFolderBtn";
             this.OpenFolderBtn.Size = new System.Drawing.Size(188, 72);
-            this.OpenFolderBtn.TabIndex = 7;
+            this.OpenFolderBtn.TabIndex = 3;
             this.OpenFolderBtn.Text = "フォルダを開く";
             this.OpenFolderBtn.UseVisualStyleBackColor = false;
             this.OpenFolderBtn.Click += new System.EventHandler(this.OpenFolderBtn_Click);
@@ -176,35 +174,13 @@
             this.RemoteRadioBtn.Text = "リモート";
             this.RemoteRadioBtn.UseVisualStyleBackColor = true;
             // 
-            // SuffixComboBox
-            // 
-            this.SuffixComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
-            this.SuffixComboBox.Font = new System.Drawing.Font("MS UI Gothic", 12F);
-            this.SuffixComboBox.FormattingEnabled = true;
-            this.SuffixComboBox.Location = new System.Drawing.Point(162, 275);
-            this.SuffixComboBox.Name = "SuffixComboBox";
-            this.SuffixComboBox.Size = new System.Drawing.Size(556, 24);
-            this.SuffixComboBox.TabIndex = 6;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("MS UI Gothic", 15F);
-            this.label4.Location = new System.Drawing.Point(31, 275);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(89, 20);
-            this.label4.TabIndex = 8;
-            this.label4.Text = "サフィックス";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(754, 430);
+            this.ClientSize = new System.Drawing.Size(754, 395);
             this.Controls.Add(this.OpenFolderBtn);
             this.Controls.Add(this.SettingBtn);
-            this.Controls.Add(this.SuffixComboBox);
-            this.Controls.Add(this.label4);
             this.Controls.Add(this.TypeGroupBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.SaveFolderCmb);
@@ -235,8 +211,6 @@
         private System.Windows.Forms.GroupBox TypeGroupBox;
         private System.Windows.Forms.RadioButton LocalRadioBtn;
         private System.Windows.Forms.RadioButton RemoteRadioBtn;
-        private System.Windows.Forms.ComboBox SuffixComboBox;
-        private System.Windows.Forms.Label label4;
     }
 }
 
