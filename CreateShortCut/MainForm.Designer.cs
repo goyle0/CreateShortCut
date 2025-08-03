@@ -38,6 +38,9 @@
             this.label3 = new System.Windows.Forms.Label();
             this.SettingBtn = new System.Windows.Forms.Button();
             this.OpenFolderBtn = new System.Windows.Forms.Button();
+            this.TypeGroupBox = new System.Windows.Forms.GroupBox();
+            this.RemoteRadioBtn = new System.Windows.Forms.RadioButton();
+            this.LocalRadioBtn = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // CreateBtn
@@ -45,7 +48,7 @@
             this.CreateBtn.BackColor = System.Drawing.Color.RoyalBlue;
             this.CreateBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.CreateBtn.Font = new System.Drawing.Font("MS UI Gothic", 15F);
-            this.CreateBtn.Location = new System.Drawing.Point(529, 238);
+            this.CreateBtn.Location = new System.Drawing.Point(529, 308);
             this.CreateBtn.Name = "CreateBtn";
             this.CreateBtn.Size = new System.Drawing.Size(188, 72);
             this.CreateBtn.TabIndex = 5;
@@ -114,7 +117,7 @@
             this.SettingBtn.BackColor = System.Drawing.Color.LightGreen;
             this.SettingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.SettingBtn.Font = new System.Drawing.Font("MS UI Gothic", 11F);
-            this.SettingBtn.Location = new System.Drawing.Point(316, 238);
+            this.SettingBtn.Location = new System.Drawing.Point(316, 308);
             this.SettingBtn.Name = "SettingBtn";
             this.SettingBtn.Size = new System.Drawing.Size(188, 72);
             this.SettingBtn.TabIndex = 4;
@@ -127,7 +130,7 @@
             this.OpenFolderBtn.BackColor = System.Drawing.Color.Orange;
             this.OpenFolderBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.OpenFolderBtn.Font = new System.Drawing.Font("MS UI Gothic", 11F);
-            this.OpenFolderBtn.Location = new System.Drawing.Point(103, 238);
+            this.OpenFolderBtn.Location = new System.Drawing.Point(103, 308);
             this.OpenFolderBtn.Name = "OpenFolderBtn";
             this.OpenFolderBtn.Size = new System.Drawing.Size(188, 72);
             this.OpenFolderBtn.TabIndex = 3;
@@ -135,13 +138,50 @@
             this.OpenFolderBtn.UseVisualStyleBackColor = false;
             this.OpenFolderBtn.Click += new System.EventHandler(this.OpenFolderBtn_Click);
             // 
+            // TypeGroupBox
+            // 
+            this.TypeGroupBox.Controls.Add(this.LocalRadioBtn);
+            this.TypeGroupBox.Controls.Add(this.RemoteRadioBtn);
+            this.TypeGroupBox.Font = new System.Drawing.Font("MS UI Gothic", 12F);
+            this.TypeGroupBox.Location = new System.Drawing.Point(162, 220);
+            this.TypeGroupBox.Name = "TypeGroupBox";
+            this.TypeGroupBox.Size = new System.Drawing.Size(556, 50);
+            this.TypeGroupBox.TabIndex = 4;
+            this.TypeGroupBox.TabStop = false;
+            this.TypeGroupBox.Text = "種別";
+            // 
+            // LocalRadioBtn
+            // 
+            this.LocalRadioBtn.AutoSize = true;
+            this.LocalRadioBtn.Checked = true;
+            this.LocalRadioBtn.Font = new System.Drawing.Font("MS UI Gothic", 12F);
+            this.LocalRadioBtn.Location = new System.Drawing.Point(20, 22);
+            this.LocalRadioBtn.Name = "LocalRadioBtn";
+            this.LocalRadioBtn.Size = new System.Drawing.Size(90, 20);
+            this.LocalRadioBtn.TabIndex = 0;
+            this.LocalRadioBtn.TabStop = true;
+            this.LocalRadioBtn.Text = "ローカル";
+            this.LocalRadioBtn.UseVisualStyleBackColor = true;
+            // 
+            // RemoteRadioBtn
+            // 
+            this.RemoteRadioBtn.AutoSize = true;
+            this.RemoteRadioBtn.Font = new System.Drawing.Font("MS UI Gothic", 12F);
+            this.RemoteRadioBtn.Location = new System.Drawing.Point(150, 22);
+            this.RemoteRadioBtn.Name = "RemoteRadioBtn";
+            this.RemoteRadioBtn.Size = new System.Drawing.Size(90, 20);
+            this.RemoteRadioBtn.TabIndex = 1;
+            this.RemoteRadioBtn.Text = "リモート";
+            this.RemoteRadioBtn.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(754, 325);
+            this.ClientSize = new System.Drawing.Size(754, 395);
             this.Controls.Add(this.OpenFolderBtn);
             this.Controls.Add(this.SettingBtn);
+            this.Controls.Add(this.TypeGroupBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.SaveFolderCmb);
             this.Controls.Add(this.NameTxt);
@@ -168,6 +208,9 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button SettingBtn;
         private System.Windows.Forms.Button OpenFolderBtn;
+        private System.Windows.Forms.GroupBox TypeGroupBox;
+        private System.Windows.Forms.RadioButton LocalRadioBtn;
+        private System.Windows.Forms.RadioButton RemoteRadioBtn;
     }
 }
 

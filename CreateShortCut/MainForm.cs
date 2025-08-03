@@ -72,21 +72,49 @@ namespace CreateShortCut
             }
             catch (UnauthorizedAccessException ex)
             {
+                Console.WriteLine("================== アクセス拒否エラー ==================");
+                Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                Console.WriteLine($"発生場所: InitializeComboBox()メソッド");
+                Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                Console.WriteLine("========================================================");
+                
                 LoggingUtility.LogError($"アクセス拒否エラー: {ex.Message}", ex);
                 MessageBox.Show($"アクセス拒否: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (DirectoryNotFoundException ex)
             {
+                Console.WriteLine("============== ディレクトリ未発見エラー ================");
+                Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                Console.WriteLine($"発生場所: InitializeComboBox()メソッド");
+                Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                Console.WriteLine("========================================================");
+                
                 LoggingUtility.LogError($"ディレクトリが見つかりません: {ex.Message}", ex);
                 MessageBox.Show($"ディレクトリが見つかりません: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (IOException ex)
             {
+                Console.WriteLine("===================== IOエラー =======================");
+                Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                Console.WriteLine($"発生場所: InitializeComboBox()メソッド");
+                Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                Console.WriteLine("========================================================");
+                
                 LoggingUtility.LogError($"IO エラー: {ex.Message}", ex);
                 MessageBox.Show($"IO エラー: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
+                Console.WriteLine("================== 予期しないエラー ====================");
+                Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                Console.WriteLine($"発生場所: InitializeComboBox()メソッド");
+                Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                Console.WriteLine("========================================================");
+                
                 LoggingUtility.LogError($"予期しないエラー: {ex.Message}", ex);
                 MessageBox.Show($"予期しないエラー: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -117,8 +145,25 @@ namespace CreateShortCut
         {
             try
             {
+                // ラジオボタンの選択状態に基づいてプレフィックスを決定（角括弧を丸括弧に変更）
+                string prefix = LocalRadioBtn.Checked ? "(Local)" : "(Remote)";
+                
+                // ローカル/リモートの候補を半角空白区切りで連結
+                string suffix = LocalRadioBtn.Checked ? 
+                    " local ローカル ろ ろーかる ro-karu ro- ろー" : 
+                    " Remote リモート り りもーと rimo-to rimoto rimo りもー りも";
+                
+                // ファイル名を構築してサニタイズ
+                string rawFileName = $"{prefix}{NameTxt.Text}{suffix}";
+                string sanitizedFileName = SanitizeFileName(rawFileName);
+                
                 // URLファイルのパスを作成
-                string urlFilePath = Path.Combine(shortcutPath, $"{NameTxt.Text}.url");
+                string urlFilePath = Path.Combine(shortcutPath, $"{sanitizedFileName}.url");
+                
+                // デバッグログ: ファイルパス情報
+                LoggingUtility.LogError($"元のファイル名: {rawFileName}");
+                LoggingUtility.LogError($"サニタイズ後: {sanitizedFileName}");
+                LoggingUtility.LogError($"最終ファイルパス: {urlFilePath}");
 
                 // デバッグログ: 受信したURL
                 LoggingUtility.LogError($"受信URL: {url}");
@@ -153,11 +198,25 @@ namespace CreateShortCut
             }
             catch (UriFormatException ex)
             {
+                Console.WriteLine("==================== URI形式エラー ====================");
+                Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                Console.WriteLine($"発生場所: CreateShortcut()メソッド");
+                Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                Console.WriteLine("========================================================");
+                
                 LoggingUtility.LogError($"URL形式エラー: {ex.Message}", ex);
                 MessageBox.Show("URLの形式が正しくありません。\n\n" + ex.Message, "URL形式エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
+                Console.WriteLine("================ ショートカット作成エラー ================");
+                Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                Console.WriteLine($"発生場所: CreateShortcut()メソッド");
+                Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                Console.WriteLine("========================================================");
+                
                 LoggingUtility.LogError($"ショートカット作成エラー: {ex.Message}", ex);
                 MessageBox.Show("ショートカットの作成中にエラーが発生しました。\n\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -243,6 +302,8 @@ namespace CreateShortCut
 
         private void OpenFolderBtn_Click(object sender, EventArgs e)
         {
+            string selectedPath = null;
+            
             try
             {
                 // 選択されているフォルダパスを取得
@@ -252,7 +313,7 @@ namespace CreateShortCut
                     return;
                 }
 
-                string selectedPath = SaveFolderCmb.SelectedItem.ToString();
+                selectedPath = SaveFolderCmb.SelectedItem.ToString();
 
                 // フォルダの存在確認
                 if (!Directory.Exists(selectedPath))
@@ -267,6 +328,14 @@ namespace CreateShortCut
             }
             catch (Exception ex)
             {
+                Console.WriteLine("=============== フォルダオープンエラー ================");
+                Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                Console.WriteLine($"発生場所: OpenFolderBtn_Click()メソッド");
+                Console.WriteLine($"対象パス: {selectedPath ?? "取得できませんでした"}");
+                Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                Console.WriteLine("========================================================");
+                
                 LoggingUtility.LogError($"フォルダを開く際にエラーが発生しました: {ex.Message}", ex);
                 MessageBox.Show($"フォルダを開く際にエラーが発生しました:\n{ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -469,14 +538,30 @@ namespace CreateShortCut
                         }
                         LoggingUtility.LogError($"ファイルアクセス確認成功: {absolutePath}");
                     }
-                    catch (UnauthorizedAccessException)
+                    catch (UnauthorizedAccessException ex)
                     {
+                        Console.WriteLine("============= ファイルアクセス権限エラー =================");
+                        Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                        Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                        Console.WriteLine($"発生場所: ValidateFileAccess()メソッド（ファイルアクセス）");
+                        Console.WriteLine($"対象パス: {absolutePath}");
+                        Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                        Console.WriteLine("========================================================");
+                        
                         errorMessage = $"ファイルへのアクセス権限がありません:\n{absolutePath}";
                         LoggingUtility.LogError($"ファイルアクセス権限エラー: {absolutePath}");
                         return false;
                     }
                     catch (IOException ex)
                     {
+                        Console.WriteLine("================== ファイルIOエラー ====================");
+                        Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                        Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                        Console.WriteLine($"発生場所: ValidateFileAccess()メソッド（ファイルアクセス）");
+                        Console.WriteLine($"対象パス: {absolutePath}");
+                        Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                        Console.WriteLine("========================================================");
+                        
                         errorMessage = $"ファイルアクセス中にIOエラーが発生しました:\n{absolutePath}\n{ex.Message}";
                         LoggingUtility.LogError($"ファイルIOエラー: {absolutePath} - {ex.Message}", ex);
                         return false;
@@ -492,14 +577,30 @@ namespace CreateShortCut
                         Directory.GetFiles(absolutePath);
                         LoggingUtility.LogError($"ディレクトリアクセス確認成功: {absolutePath}");
                     }
-                    catch (UnauthorizedAccessException)
+                    catch (UnauthorizedAccessException ex)
                     {
+                        Console.WriteLine("=========== ディレクトリアクセス権限エラー ============");
+                        Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                        Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                        Console.WriteLine($"発生場所: ValidateFileAccess()メソッド（ディレクトリアクセス）");
+                        Console.WriteLine($"対象パス: {absolutePath}");
+                        Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                        Console.WriteLine("========================================================");
+                        
                         errorMessage = $"ディレクトリへのアクセス権限がありません:\n{absolutePath}";
                         LoggingUtility.LogError($"ディレクトリアクセス権限エラー: {absolutePath}");
                         return false;
                     }
                     catch (IOException ex)
                     {
+                        Console.WriteLine("================ ディレクトリIOエラー =================");
+                        Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                        Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                        Console.WriteLine($"発生場所: ValidateFileAccess()メソッド（ディレクトリアクセス）");
+                        Console.WriteLine($"対象パス: {absolutePath}");
+                        Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                        Console.WriteLine("========================================================");
+                        
                         errorMessage = $"ディレクトリアクセス中にIOエラーが発生しました:\n{absolutePath}\n{ex.Message}";
                         LoggingUtility.LogError($"ディレクトリIOエラー: {absolutePath} - {ex.Message}", ex);
                         return false;
@@ -511,28 +612,131 @@ namespace CreateShortCut
             }
             catch (ArgumentException ex)
             {
+                Console.WriteLine("================= パス形式エラー ==================");
+                Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                Console.WriteLine($"発生場所: ValidateFileAccess()メソッド");
+                Console.WriteLine($"対象パス: {localPath}");
+                Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                Console.WriteLine("========================================================");
+                
                 errorMessage = $"無効なパス形式です:\n{localPath}\n{ex.Message}";
                 LoggingUtility.LogError($"パス形式エラー: {localPath} - {ex.Message}", ex);
                 return false;
             }
             catch (NotSupportedException ex)
             {
+                Console.WriteLine("============ パス形式サポート外エラー =============");
+                Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                Console.WriteLine($"発生場所: ValidateFileAccess()メソッド");
+                Console.WriteLine($"対象パス: {localPath}");
+                Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                Console.WriteLine("========================================================");
+                
                 errorMessage = $"サポートされていないパス形式です:\n{localPath}\n{ex.Message}";
                 LoggingUtility.LogError($"パス形式サポート外: {localPath} - {ex.Message}", ex);
                 return false;
             }
             catch (PathTooLongException ex)
             {
+                Console.WriteLine("================== パス長エラー ===================");
+                Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                Console.WriteLine($"発生場所: ValidateFileAccess()メソッド");
+                Console.WriteLine($"対象パス: {localPath}");
+                Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                Console.WriteLine("========================================================");
+                
                 errorMessage = $"パスが長すぎます:\n{localPath}\n{ex.Message}";
                 LoggingUtility.LogError($"パス長エラー: {localPath} - {ex.Message}", ex);
                 return false;
             }
             catch (Exception ex)
             {
+                Console.WriteLine("============ ValidateFileAccess予期しないエラー ============");
+                Console.WriteLine($"エラータイプ: {ex.GetType().Name}");
+                Console.WriteLine($"エラーメッセージ: {ex.Message}");
+                Console.WriteLine($"発生場所: ValidateFileAccess()メソッド");
+                Console.WriteLine($"対象パス: {localPath}");
+                Console.WriteLine($"スタックトレース:\n{ex.StackTrace}");
+                Console.WriteLine("========================================================");
+                
                 errorMessage = $"パス検証中に予期しないエラーが発生しました:\n{localPath}\n{ex.Message}";
                 LoggingUtility.LogError($"ValidateFileAccess予期しないエラー: {localPath} - {ex.Message}", ex);
                 return false;
             }
         }
+
+        /// <summary>
+        /// ファイル名をWindowsファイルシステム用にサニタイズする
+        /// </summary>
+        /// <param name="fileName">元のファイル名</param>
+        /// <returns>サニタイズされたファイル名</returns>
+        private string SanitizeFileName(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                return "無題";
+            }
+
+            try
+            {
+                // Windowsで禁止されている文字を安全な文字に置換
+                char[] invalidChars = Path.GetInvalidFileNameChars();
+                string sanitized = fileName;
+
+                foreach (char invalidChar in invalidChars)
+                {
+                    sanitized = sanitized.Replace(invalidChar, '_');
+                }
+
+                // 追加の問題文字を置換
+                sanitized = sanitized.Replace('[', '(')
+                                   .Replace(']', ')')
+                                   .Replace('<', '(')
+                                   .Replace('>', ')')
+                                   .Replace('|', '_')
+                                   .Replace('?', '_')
+                                   .Replace('*', '_');
+
+                // 先頭・末尾の空白とピリオドを削除
+                sanitized = sanitized.Trim().Trim('.');
+
+                // 空になった場合のフォールバック
+                if (string.IsNullOrWhiteSpace(sanitized))
+                {
+                    sanitized = "無題";
+                }
+
+                // ファイル名の長さを制限（拡張子.url分を考慮して240文字）
+                if (sanitized.Length > 240)
+                {
+                    sanitized = sanitized.Substring(0, 240);
+                    LoggingUtility.LogError($"ファイル名が長すぎるため切り詰めました: {sanitized.Length}文字に短縮");
+                }
+
+                // Windowsの予約語をチェック
+                string[] reservedNames = { "CON", "PRN", "AUX", "NUL", 
+                    "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+                    "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
+
+                string upperName = sanitized.ToUpper();
+                if (reservedNames.Contains(upperName))
+                {
+                    sanitized = "_" + sanitized;
+                    LoggingUtility.LogError($"予約語を回避: _{sanitized}");
+                }
+
+                LoggingUtility.LogError($"ファイル名サニタイズ完了: '{fileName}' → '{sanitized}'");
+                return sanitized;
+            }
+            catch (Exception ex)
+            {
+                LoggingUtility.LogError($"ファイル名サニタイズエラー: {ex.Message}", ex);
+                return "無題_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            }
+        }
+
     }
 }
