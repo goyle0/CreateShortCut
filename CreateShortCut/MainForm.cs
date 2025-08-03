@@ -295,6 +295,36 @@ namespace CreateShortCut
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            // Ctrl + W でアプリケーション終了（確認ダイアログ付き）
+            if (keyData == (Keys.Control | Keys.W))
+            {
+                try
+                {
+                    // 確認ダイアログでアプリケーション終了確認
+                    var result = MessageBox.Show(
+                        "アプリケーションを終了しますか？",
+                        "終了確認", 
+                        MessageBoxButtons.YesNo, 
+                        MessageBoxIcon.Question,
+                        MessageBoxDefaultButton.Button1); // はいがデフォルト
+                        
+                    if (result == DialogResult.Yes)
+                    {
+                        LoggingUtility.LogError("Ctrl+W によるアプリケーション終了");
+                        Application.Exit();
+                    }
+                    
+                    return true; // キー処理完了を通知
+                }
+                catch (Exception ex)
+                {
+                    LoggingUtility.LogError($"Ctrl+W処理エラー: {ex.Message}", ex);
+                    // エラー時はフォールバック（通常終了）
+                    this.Close();
+                    return true;
+                }
+            }
+            
             return base.ProcessCmdKey(ref msg, keyData);
         }
 

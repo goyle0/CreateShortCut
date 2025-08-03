@@ -207,5 +207,40 @@ namespace CreateShortCut
                 return false;
             }
         }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // Ctrl + W でアプリケーション終了（設定画面からの確認ダイアログ付き）
+            if (keyData == (Keys.Control | Keys.W))
+            {
+                try
+                {
+                    // 設定画面からのアプリ終了確認（未保存変更に関する警告）
+                    var result = MessageBox.Show(
+                        "設定を保存せずにアプリケーションを終了しますか？",
+                        "終了確認", 
+                        MessageBoxButtons.YesNo, 
+                        MessageBoxIcon.Warning,
+                        MessageBoxDefaultButton.Button1); // はいがデフォルト
+                        
+                    if (result == DialogResult.Yes)
+                    {
+                        LoggingUtility.LogError("Ctrl+W による設定画面からのアプリケーション終了");
+                        Application.Exit();
+                    }
+                    
+                    return true; // キー処理完了を通知
+                }
+                catch (Exception ex)
+                {
+                    LoggingUtility.LogError($"設定画面Ctrl+W処理エラー: {ex.Message}", ex);
+                    // エラー時はフォールバック（設定画面のみ閉じる）
+                    this.Close();
+                    return true;
+                }
+            }
+            
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
     }
 }
