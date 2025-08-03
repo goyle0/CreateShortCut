@@ -197,8 +197,8 @@ namespace CreateShortCut
                 // .urlファイル作成完了ログ
                 LoggingUtility.LogError($".urlファイル作成完了: {urlFilePath}");
 
-                // URLファイルを作成（Windows標準のANSIエンコーディングを使用）
-                System.IO.File.WriteAllText(urlFilePath, urlFileContent, Encoding.Default);
+                // URLファイルを作成（Shift-JISエンコーディングで統一）
+                System.IO.File.WriteAllText(urlFilePath, urlFileContent, Encoding.GetEncoding("Shift_JIS"));
 
                 MessageBox.Show(".urlファイルが作成されました。", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -502,9 +502,15 @@ namespace CreateShortCut
                 // パスの正規化（バックスラッシュを統一、重複スラッシュを除去）
                 absolutePath = Path.GetFullPath(absolutePath);
 
-                // file:///形式のURIに変換
-                Uri fileUri = new Uri(absolutePath);
-                string fileUrl = fileUri.AbsoluteUri;
+                // 手動でfile:///形式のURLを構築（UTF-8パーセントエンコーディングを回避）
+                // バックスラッシュをスラッシュに変換
+                string urlPath = absolutePath.Replace('\\', '/');
+                
+                // スペースのみを %20 にエスケープ（日本語文字はエスケープしない）
+                urlPath = urlPath.Replace(" ", "%20");
+                
+                // file:/// プレフィックスを追加
+                string fileUrl = "file:///" + urlPath;
 
                 LoggingUtility.LogError($"ローカルパス変換: {localPath} → {fileUrl}");
                 LoggingUtility.LogError($"変換後表示用パス: {GetUserFriendlyPath(fileUrl)}");

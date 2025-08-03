@@ -35,6 +35,10 @@ CreateShortCutは、C#（.NET Framework 4.8）で書かれたWindows Formsアプ
 
 - **設定**: App.configに`FolderPath`と`DefaultPath`設定を保存
 - **エンコーディング**: 日本語テキストサポートのため全体でShift-JISエンコーディングを使用
+  - .urlファイル保存: Shift-JISエンコーディング（Issue #10で統一）
+  - ログ出力: Shift-JISエンコーディング  
+  - UI表示: .NET FrameworkのUnicode標準処理
+  - App.config: UTF-8エンコーディング
 - **COM参照**: WindowsショートカットファンクションのためIWshRuntimeLibraryを使用
 - **エラー処理**: 複数のフォールバックログ場所を持つ包括的なエラーログ
 - **権限処理**: 操作前にディレクトリとファイルアクセスを検証
@@ -91,6 +95,84 @@ App.configファイルには以下が含まれます：
 - **実装場所**: SettingForm.cs `HasFileWriteAccess()`メソッド
 - **検証方法**: App.configファイルに対してFileMode.Open、FileAccess.Writeでの一時アクセステスト
 - **フォールバック処理**: 権限不足時はUnauthorizedAccessExceptionをキャッチし、適切なエラーメッセージを表示
+
+## パス文字化け問題対応（Issue #10）
+
+### 概要
+Issue #10「パスが文字化けしている　2回目」として報告されたURL生成時の日本語文字UTF-8パーセントエンコーディング問題の根本的解決。
+
+### 問題の背景と根本原因特定
+- **Issue #7**: ログ出力の文字化け問題（GetUserFriendlyPath()メソッドで解決済み）
+- **Issue #10**: .urlファイル内のURL自体が文字化け（UTF-8パーセントエンコーディング）
+- **根本原因**: ConvertToValidUrl()メソッドでの.NET Uri クラス使用により自動UTF-8エンコーディング発生
+- **具体例**: 「教材」→「%E6%95%99%E6%9D%90」（UTF-8パーセントエンコーディング）
+
+### 解決アプローチ
+
+#### 第1段階：エンコーディング統一（初回修正）
+- **.urlファイル保存エンコーディング**: `Encoding.Default` → `Encoding.GetEncoding("Shift_JIS")`
+- **実装場所**: MainForm.cs CreateShortcut()メソッド内
+- **結果**: 文字化け継続（根本原因ではなかった）
+
+#### 第2段階：URL生成アルゴリズム修正（根本解決）
+- **修正場所**: MainForm.cs ConvertToValidUrl()メソッド
+- **問題コード**: `new Uri(absolutePath).AbsoluteUri` （自動UTF-8エンコーディング）
+- **解決策**: 手動file:///URL構築でUTF-8エンコーディング回避
+
+### 技術的実装詳細
+
+#### ConvertToValidUrl()メソッド修正
+```csharp
+// 修正前（問題のあるコード）
+Uri fileUri = new Uri(absolutePath);
+string fileUrl = fileUri.AbsoluteUri;  // ←自動UTF-8エンコーディング
+
+// 修正後（手動URL構築）
+string urlPath = absolutePath.Replace('\\', '/');     // バックスラッシュ→スラッシュ
+urlPath = urlPath.Replace(" ", "%20");               // スペースのみエスケープ
+string fileUrl = "file:///" + urlPath;               // 手動file:///構築
+```
+
+#### .urlファイル保存（既存修正維持）
+```csharp
+// Shift-JISエンコーディングで保存（Issue #10第1段階修正）
+System.IO.File.WriteAllText(urlFilePath, urlFileContent, Encoding.GetEncoding("Shift_JIS"));
+```
+
+### 修正効果と検証結果
+
+#### Before（問題状況）
+```
+入力: C:\Users\s-fujino\mtrx Dropbox\matrix\教材
+結果: file:///C:/Users/s-fujino/mtrx%20Dropbox/matrix/%E6%95%99%E6%9D%90
+問題: 日本語「教材」がUTF-8パーセントエンコーディング「%E6%95%99%E6%9D%90」
+```
+
+#### After（解決後）
+```
+入力: C:\Users\s-fujino\mtrx Dropbox\matrix\教材  
+結果: file:///C:/Users/s-fujino/mtrx%20Dropbox/matrix/教材
+効果: 日本語文字はそのまま保持、スペースのみ%20エスケープ
+```
+
+### 互換性確認
+
+#### Issue #7機能との互換性
+- **GetUserFriendlyPath()メソッド**: ✅ 問題なし
+- **動作**: file:///URLデコードで正常な日本語パス復元
+- **影響**: なし（むしろ処理が効率化）
+
+#### Windows .urlファイル標準準拠
+- **ファイル形式**: `[InternetShortcut]\nURL=<URL>` ✅ 準拠
+- **エンコーディング**: Shift-JIS（日本語環境標準） ✅ 適切
+- **URL形式**: file:///スキーム with 日本語文字 ✅ 対応
+- **ブラウザ互換**: Windows標準ブラウザで正常動作 ✅ 確認済み
+
+### 技術的特徴
+- **根本解決**: UTF-8パーセントエンコーディング問題の完全解決
+- **標準準拠**: Windows .urlファイル仕様完全準拠
+- **後方互換**: 既存のIssue #7機能と完全互換
+- **エンコーディング統一**: Shift-JIS統一でログ・ファイル一貫性確保
 
 ## キーボードショートカット機能（Ctrl+W）
 
