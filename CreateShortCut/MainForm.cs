@@ -32,9 +32,12 @@ namespace CreateShortCut
             SaveFolderCmb.TabIndex = 0;
             LinkTxt.TabIndex = 1;
             NameTxt.TabIndex = 2;
-            OpenFolderBtn.TabIndex = 3;
-            SettingBtn.TabIndex = 4;
-            CreateBtn.TabIndex = 5;
+            TypeGroupBox.TabIndex = 3;
+            LocalRadioBtn.TabIndex = 4;
+            RemoteRadioBtn.TabIndex = 5;
+            OpenFolderBtn.TabIndex = 6;
+            SettingBtn.TabIndex = 7;
+            CreateBtn.TabIndex = 8;
 
             // EnterキーでCreateBtn_Clickが実行されるように設定
             this.AcceptButton = CreateBtn;
@@ -117,8 +120,11 @@ namespace CreateShortCut
         {
             try
             {
-                // URLファイルのパスを作成
-                string urlFilePath = Path.Combine(shortcutPath, $"{NameTxt.Text}.url");
+                // ラジオボタンの選択状態に基づいてプレフィックスを決定
+                string prefix = LocalRadioBtn.Checked ? "[Local]" : "[Remote]";
+                
+                // URLファイルのパスを作成（プレフィックス付き）
+                string urlFilePath = Path.Combine(shortcutPath, $"{prefix}{NameTxt.Text}.url");
 
                 // デバッグログ: 受信したURL
                 LoggingUtility.LogError($"受信URL: {url}");
